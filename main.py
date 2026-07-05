@@ -124,6 +124,77 @@ def view_accounts():
         )
 
 
+def search_account():
+
+    account = get_text(
+        "\nEnter account holder name: "
+    )
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM accounts
+        WHERE TRIM(LOWER(name)) = TRIM(LOWER(?))
+        """,
+        (
+            account,
+        )
+    )
+
+    result = cursor.fetchone()
+
+    if result:
+
+        print(
+            f"\nID : {result[0]}"
+        )
+
+        print(
+            f"Account Holder : {result[1]}"
+        )
+
+        print(
+            f"Balance : ₹{result[2]}"
+        )
+
+    else:
+
+        print(
+            "\nAccount not found"
+        )
+
+
+def delete_account():
+
+    account = get_text(
+        "\nEnter account holder name: "
+    )
+
+    cursor.execute(
+        """
+        DELETE FROM accounts
+        WHERE TRIM(LOWER(name)) = TRIM(LOWER(?))
+        """,
+        (
+            account,
+        )
+    )
+
+    connection.commit()
+
+    if cursor.rowcount > 0:
+
+        print(
+            "\nAccount deleted"
+        )
+
+    else:
+
+        print(
+            "\nAccount not found"
+        )
+
+
 def main():
 
     while True:
@@ -132,7 +203,9 @@ def main():
 
         print("1 - Create Account")
         print("2 - View Accounts")
-        print("3 - Exit")
+        print("3 - Search Account")
+        print("4 - Delete Account")
+        print("5 - Exit")
 
         choice = input(
             "\nEnter choice: "
@@ -148,7 +221,17 @@ def main():
 
         elif choice == "3":
 
-            print("\nGoodbye")
+            search_account()
+
+        elif choice == "4":
+
+            delete_account()
+
+        elif choice == "5":
+
+            print(
+                "\nGoodbye"
+            )
 
             break
 
