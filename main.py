@@ -194,6 +194,56 @@ def delete_account():
             "\nAccount not found"
         )
 
+def deposit_money():
+
+    account = get_text(
+        "\nEnter account holder name: "
+    )
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM accounts
+        WHERE TRIM(LOWER(name)) = TRIM(LOWER(?))
+        """,
+        (
+            account,
+        )
+    )
+
+    result = cursor.fetchone()
+
+    if result is None:
+
+        print(
+            "\nAccount not found"
+        )
+
+        return
+
+    amount = get_number(
+        "Enter deposit amount: "
+    )
+
+    new_balance = result[2] + amount
+
+    cursor.execute(
+        """
+        UPDATE accounts
+        SET balance = ?
+        WHERE id = ?
+        """,
+        (
+            new_balance,
+            result[0]
+        )
+    )
+
+    connection.commit()
+
+    print(
+        "\nDeposit successful"
+    )
 
 def main():
 
@@ -205,7 +255,8 @@ def main():
         print("2 - View Accounts")
         print("3 - Search Account")
         print("4 - Delete Account")
-        print("5 - Exit")
+        print("5 - Deposit")
+        print("6 - Exit")
 
         choice = input(
             "\nEnter choice: "
@@ -226,8 +277,12 @@ def main():
         elif choice == "4":
 
             delete_account()
-
+        
         elif choice == "5":
+
+            deposit_money()
+
+        elif choice == "6":
 
             print(
                 "\nGoodbye"
