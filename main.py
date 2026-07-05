@@ -163,7 +163,6 @@ def search_account():
             "\nAccount not found"
         )
 
-
 def delete_account():
 
     account = get_text(
@@ -193,6 +192,7 @@ def delete_account():
         print(
             "\nAccount not found"
         )
+
 
 def deposit_money():
 
@@ -245,6 +245,136 @@ def deposit_money():
         "\nDeposit successful"
     )
 
+
+def withdraw_money():
+
+    account = get_text(
+        "\nEnter account holder name: "
+    )
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM accounts
+        WHERE TRIM(LOWER(name)) = TRIM(LOWER(?))
+        """,
+        (
+            account,
+        )
+    )
+
+    result = cursor.fetchone()
+
+    if result is None:
+
+        print(
+            "\nAccount not found"
+        )
+
+        return
+
+    amount = get_number(
+        "Enter withdrawal amount: "
+    )
+
+    if amount > result[2]:
+
+        print(
+            "\nInsufficient balance"
+        )
+
+        return
+
+    new_balance = result[2] - amount
+
+    cursor.execute(
+        """
+        UPDATE accounts
+        SET balance = ?
+        WHERE id = ?
+        """,
+        (
+            new_balance,
+            result[0]
+        )
+    )
+
+    connection.commit()
+
+    print(
+        "\nWithdrawal successful"
+    )
+
+
+def check_balance():
+
+    account = get_text(
+        "\nEnter account holder name: "
+    )
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM accounts
+        WHERE TRIM(LOWER(name)) = TRIM(LOWER(?))
+        """,
+        (
+            account,
+        )
+    )
+
+    result = cursor.fetchone()
+
+    if result is None:
+
+        print(
+            "\nAccount not found"
+        )
+
+        return
+
+    print(
+        f"\nCurrent Balance : ₹{result[2]}"
+    )
+
+
+def bank_summary():
+
+    print(
+        "\nBANK SUMMARY\n"
+    )
+
+    cursor.execute(
+        """
+        SELECT balance
+        FROM accounts
+        """
+    )
+
+    accounts = cursor.fetchall()
+
+    if len(accounts) == 0:
+
+        print(
+            "No accounts found"
+        )
+
+        return
+
+    total_balance = 0
+
+    for account in accounts:
+
+        total_balance += account[0]
+
+    print(
+        f"Total Accounts : {len(accounts)}"
+    )
+
+    print(
+        f"Total Bank Balance : ₹{total_balance}"
+    )
+
 def main():
 
     while True:
@@ -255,12 +385,15 @@ def main():
         print("2 - View Accounts")
         print("3 - Search Account")
         print("4 - Delete Account")
-        print("5 - Deposit")
-        print("6 - Exit")
+        print("5 - Deposit Money")
+        print("6 - Withdraw Money")
+        print("7 - Check Balance")
+        print("8 - Bank Summary")
+        print("9 - Exit")
 
         choice = input(
             "\nEnter choice: "
-        )
+        ).strip()
 
         if choice == "1":
 
@@ -277,12 +410,24 @@ def main():
         elif choice == "4":
 
             delete_account()
-        
+
         elif choice == "5":
 
             deposit_money()
 
         elif choice == "6":
+
+            withdraw_money()
+
+        elif choice == "7":
+
+            check_balance()
+
+        elif choice == "8":
+
+            bank_summary()
+
+        elif choice == "9":
 
             print(
                 "\nGoodbye"
@@ -298,3 +443,5 @@ def main():
 
 
 main()
+
+connection.close()
