@@ -375,6 +375,40 @@ def bank_summary():
         f"Total Bank Balance : ₹{total_balance}"
     )
 
+def account_report():
+
+    print(
+        "\nACCOUNT REPORT\n"
+    )
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM accounts
+        ORDER BY balance DESC
+        """
+    )
+
+    accounts = cursor.fetchall()
+
+    if len(accounts) == 0:
+
+        print(
+            "No accounts found"
+        )
+
+        return
+
+    print(
+        "ID | Account Holder | Balance"
+    )
+
+    for account in accounts:
+
+        print(
+            f"{account[0]} | {account[1]} | ₹{account[2]}"
+        )
+
 def main():
 
     while True:
@@ -389,7 +423,8 @@ def main():
         print("6 - Withdraw Money")
         print("7 - Check Balance")
         print("8 - Bank Summary")
-        print("9 - Exit")
+        print("9 - Account Report")
+        print("10 - Exit")
 
         choice = input(
             "\nEnter choice: "
@@ -429,9 +464,13 @@ def main():
 
         elif choice == "9":
 
+            account_report()
+
+        elif choice == "10":
+
             print(
-                "\nGoodbye"
-            )
+        "\nGoodbye"
+    )
 
             break
 
